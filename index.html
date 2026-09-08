@@ -6,11 +6,11 @@
     <meta name="theme-color" content="#efe9ec">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="工时记录">
+    <meta name="apple-mobile-web-app-title" content="工时手记">
     <link rel="apple-touch-icon" href="icon_192x192.png">
     <meta name="description" content="简洁美观的工时记录管理工具">
     <link rel="manifest" href="manifest.json">
-    <title>工时记录小助手⏰</title>
+    <title>工时手记</title>
     <style>
         /* ========== 全局样式 ========== */
         * {
@@ -81,12 +81,20 @@
         }
 
         .header h1 {
-            font-size: 2.15em;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
+            font-family: 'Songti SC', 'Noto Serif SC', 'STSong', serif;
+            font-size: 2.25em;
+            font-weight: 650;
+            letter-spacing: .16em;
+            color: var(--text-dark);
+            margin: 1px 0 13px .16em;
+        }
+
+        .brand-kicker {
+            color: var(--primary-color);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .28em;
+            margin-left: .28em;
         }
 
         .header-actions {
@@ -108,6 +116,17 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .ui-icon {
+            width: 17px;
+            height: 17px;
+            flex: 0 0 auto;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .btn-primary {
@@ -190,17 +209,33 @@
         }
 
         .icon-btn {
-            background: none;
-            border: none;
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            background: var(--card-bg);
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,.45);
+            border-radius: 9px;
             cursor: pointer;
-            font-size: 16px;
-            padding: 5px;
+            padding: 0;
             opacity: .72;
-            transition: transform 0.2s ease;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, color .2s, box-shadow .2s;
         }
 
         .icon-btn:hover {
-            transform: scale(1.2);
+            transform: translateY(-1px);
+            color: var(--primary-color);
+        }
+
+        .icon-btn:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-inset);
+        }
+
+        .icon-btn.delete:hover {
+            color: var(--danger-color);
         }
 
         /* ========== 进度条样式 ========== */
@@ -363,27 +398,40 @@
         }
 
         .input-tabs {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 5px;
             margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
+            padding: 5px;
+            border: 0;
+            border-radius: 15px;
+            background: var(--bg-color);
+            box-shadow: var(--shadow-inset);
         }
 
         .input-tab {
-            padding: 10px 20px;
-            background: none;
-            border: none;
+            min-width: 0;
+            padding: 10px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 11px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 13px;
+            font-weight: 550;
+            white-space: nowrap;
             color: var(--text-light);
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
+            transition: all 0.22s ease;
         }
 
         .input-tab.active {
             color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
+            background: var(--card-bg);
+            border-color: rgba(255,255,255,.42);
+            box-shadow: var(--shadow);
         }
 
         .tab-content {
@@ -432,6 +480,15 @@
             color: var(--text-light);
             margin-top: 4px;
         }
+
+        .record-time {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--primary-color);
+        }
+
+        .record-time .ui-icon { width: 14px; height: 14px; }
 
         .delete-record-btn {
             background: none;
@@ -511,6 +568,11 @@
             transform: scale(1.05) rotate(12deg);
         }
 
+        .theme-toggle .ui-icon { width: 20px; height: 20px; margin: auto; }
+        .theme-icon-sun { display: none; }
+        [data-theme="dark"] .theme-icon-sun { display: block; }
+        [data-theme="dark"] .theme-icon-moon { display: none; }
+
         /* ========== 空状态样式 ========== */
         .empty-state {
             text-align: center;
@@ -519,10 +581,15 @@
         }
 
         .empty-state-icon {
-            font-size: 64px;
+            width: 54px;
+            height: 54px;
+            margin-left: auto;
+            margin-right: auto;
             margin-bottom: 16px;
             opacity: 0.5;
         }
+
+        .empty-state-icon .ui-icon { width: 100%; height: 100%; stroke-width: 1.25; }
 
         /* ========== 响应式设计 ========== */
         @media (max-width: 768px) {
@@ -710,16 +777,20 @@
 <body>
     <!-- 头部 -->
     <div class="header">
-        <h1>工时记录小助手⏰</h1>
+        <div class="brand-kicker">TIME JOURNAL</div>
+        <h1>工时手记</h1>
         <div class="header-actions">
             <button class="btn btn-primary" onclick="openAddGoalModal()">
-                ➕ 添加新目标
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                添加目标
             </button>
             <button class="btn btn-secondary" onclick="exportToCSV()">
-                📊 导出数据
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+                导出
             </button>
             <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">
-                📥 导入数据
+                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>
+                导入
             </button>
             <input type="file" id="importFile" accept=".csv" style="display: none;" onchange="importFromCSV(event)">
         </div>
@@ -734,7 +805,7 @@
 
         <!-- 空状态 -->
         <div id="emptyState" class="empty-state" style="display: none;">
-            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M9 9h6M9 13h6M9 17h4"/></svg></div>
             <h3>还没有目标</h3>
             <p>点击上方"添加新目标"按钮开始记录工时吧！</p>
         </div>
@@ -778,9 +849,9 @@
 
             <!-- 输入方式切换 -->
             <div class="input-tabs">
-                <button type="button" class="input-tab active" onclick="switchInputTab('calendar', event)">📅 日历选择</button>
-                <button type="button" class="input-tab" onclick="switchInputTab('time', event)">⏰ 时间选择</button>
-                <button type="button" class="input-tab" onclick="switchInputTab('text', event)">✍️ 文字输入</button>
+                <button type="button" class="input-tab active" onclick="switchInputTab('calendar', event)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg><span>按日期</span></button>
+                <button type="button" class="input-tab" onclick="switchInputTab('time', event)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>按时间</span></button>
+                <button type="button" class="input-tab" onclick="switchInputTab('text', event)"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V16l11-11 3.5 3.5-11 11H4Z"/><path d="m13.5 6.5 3.5 3.5M12 20h8"/></svg><span>文字输入</span></button>
             </div>
 
             <!-- 日历输入 -->
@@ -899,7 +970,10 @@
     <div id="toast" class="toast"></div>
 
     <!-- 主题切换按钮 -->
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换为深色模式" aria-label="切换为深色模式">☾</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="切换为深色模式" aria-label="切换为深色模式">
+        <svg class="ui-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"/></svg>
+        <svg class="ui-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+    </button>
 
     <script>
         // ========== 全局变量 ==========
@@ -1043,8 +1117,8 @@
             document.querySelectorAll('.input-tab').forEach(btn => {
                 btn.classList.remove('active');
             });
-            if (event && event.target) {
-                event.target.classList.add('active');
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
             } else {
                 // 如果没有event，手动选择对应的标签
                 const tabs = document.querySelectorAll('.input-tab');
@@ -1532,8 +1606,8 @@
             const milestones = [
                 { threshold: 25, message: '已完成 25%！继续加油！🎯' },
                 { threshold: 50, message: '已过半！你真棒！🌟' },
-                { threshold: 75, message: '75% 完成！胜利在望！🚀' },
-                { threshold: 100, message: '🎉 恭喜完成目标！你太棒了！🎊' }
+                { threshold: 75, message: '75% 完成，胜利在望！' },
+                { threshold: 100, message: '恭喜完成目标！' }
             ];
 
             // 检查之前的记录，看看是否刚好跨越里程碑
@@ -1582,8 +1656,8 @@
                                 ${goal.deadline ? `<div class="goal-deadline">截止：${formatDeadline(goal.deadline)}</div>` : ''}
                             </div>
                             <div class="goal-actions">
-                                <button class="icon-btn" onclick="openEditGoalModal(${goal.id})" title="编辑">✏️</button>
-                                <button class="icon-btn" onclick="deleteGoal(${goal.id})" title="删除">🗑️</button>
+                                <button class="icon-btn" onclick="openEditGoalModal(${goal.id})" title="编辑" aria-label="编辑目标"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></button>
+                                <button class="icon-btn delete" onclick="deleteGoal(${goal.id})" title="删除" aria-label="删除目标"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></button>
                             </div>
                         </div>
 
@@ -1611,10 +1685,12 @@
 
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
                             <button class="btn btn-primary" style="flex: 1;" onclick="openAddRecordModal(${goal.id})">
-                                ➕ 添加记录
+                                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                                添加记录
                             </button>
                             <button class="btn btn-secondary" style="flex: 1;" onclick="showHistory(${goal.id})">
-                                📋 历史记录
+                                <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6M4 4v4.6h4.6M12 8v4l3 2"/></svg>
+                                历史记录
                             </button>
                         </div>
                     </div>
@@ -1654,13 +1730,13 @@
             const recordsList = document.getElementById('recordsList');
 
             if (goal.records.length === 0) {
-                recordsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>还没有记录</p></div>';
+                recordsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg></div><p>还没有记录</p></div>';
             } else {
                 recordsList.innerHTML = goal.records.map(record => `
                     <div class="record-item">
                         <div style="flex: 1;">
                             <div class="record-date">${formatRecordDate(record.date)}</div>
-                            ${record.startTime && record.endTime ? `<div class="record-note" style="color: var(--primary-color);">⏰ ${record.startTime} - ${record.endTime}</div>` : ''}
+                            ${record.startTime && record.endTime ? `<div class="record-note record-time"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>${record.startTime} - ${record.endTime}</div>` : ''}
                             ${record.note ? `<div class="record-note">${escapeHtml(record.note)}</div>` : ''}
                         </div>
                         <div class="record-hours">${record.hours.toFixed(2)} h</div>
@@ -1823,7 +1899,6 @@
             const toggle = document.getElementById('themeToggle');
             const themeMeta = document.querySelector('meta[name="theme-color"]');
 
-            toggle.textContent = isDark ? '☀' : '☾';
             toggle.title = isDark ? '切换为浅色模式' : '切换为深色模式';
             toggle.setAttribute('aria-label', toggle.title);
             themeMeta.setAttribute('content', isDark ? '#171519' : '#efe9ec');
@@ -1887,7 +1962,7 @@
             // 显示安装提示（3秒后）
             setTimeout(() => {
                 if (deferredPrompt && !localStorage.getItem('pwa-dismissed')) {
-                    const install = confirm('💡 将"工时记录小助手"添加到主屏幕，像原生应用一样使用？\n\n✅ 离线可用\n✅ 快速启动\n✅ 全屏体验');
+                    const install = confirm('将“工时手记”添加到主屏幕，像原生应用一样使用？\n\n• 离线可用\n• 快速启动\n• 全屏体验');
                     if (install) {
                         deferredPrompt.prompt();
                         deferredPrompt.userChoice.then((choiceResult) => {
