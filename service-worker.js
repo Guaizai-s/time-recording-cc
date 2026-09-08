@@ -1,5 +1,5 @@
 // Service Worker for 工时记录小助手
-const CACHE_NAME = 'workhour-tracker-v1.0.3';
+const CACHE_NAME = 'workhour-tracker-v1.0.4';
 const urlsToCache = [
   './index.html',
   './manifest.json',
