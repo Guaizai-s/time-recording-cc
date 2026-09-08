@@ -1,19 +1,13 @@
 {
-  "name": "工时记录小助手",
-  "short_name": "工时记录",
+  "name": "工时手记",
+  "short_name": "工时手记",
   "description": "简洁美观的工时记录管理工具",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f5f7fa",
-  "theme_color": "#B8A9E0",
+  "background_color": "#efe9ec",
+  "theme_color": "#cf91a5",
   "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "icon_128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
     {
       "src": "icon_192x192.png",
       "sizes": "192x192",
